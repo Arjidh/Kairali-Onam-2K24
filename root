@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Random Team Picker</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 20px;
+        }
+        input, button {
+            margin: 10px;
+            padding: 10px;
+        }
+        .result, .admin-view, .admin-login {
+            margin-top: 20px;
+            font-size: 20px;
+        }
+        .admin-view {
+            display: none;
+        }
+        table {
+            margin: 20px auto;
+            border-collapse: collapse;
+            width: 80%;
+        }
+        table, th, td {
+            border: 1px solid black;
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <h2>Random Team Picker</h2>
+    
+    <form id="teamForm">
+        <input type="text" id="name" placeholder="Enter your name" required><br>
+        <input type="email" id="email" placeholder="Enter your email (only @kairali.online)" required><br>
+        <button type="submit">Pick a Team</button>
+    </form>
+
+    <div class="result" id="result"></div>
+
+    <div class="admin-login" id="adminLogin">
+        <h3>Admin Login</h3>
+        <input type="text" id="adminUsername" placeholder="Username" required><br>
+        <input type="password" id="adminPassword" placeholder="Password" required><br>
+        <button id="adminLoginBtn">Login as Admin</button>
+    </div>
+
+    <div class="admin-view" id="adminView">
+        <h3>Assigned Teams Table</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Assigned Team</th>
+                </tr>
+            </thead>
+            <tbody id="teamTable">
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        const teams = ['Team A', 'Team B', 'Team C', 'Team D']; // Teams list
+        const pickedEmails = new Set(); // Store used emails
+        const assignedTeams = []; // Store assigned teams (for admin view)
+
+        // Form submission event
+        document.getElementById('teamForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+
+            // Validate @kairali.online domain
+            if (!email.endsWith('@kairali.online')) {
+                document.getElementById('result').textContent = 'Only @kairali.online domain emails are allowed!';
+                return;
+            }
+
+            // Check if the email is already used
+            if (pickedEmails.has(email)) {
+                document.getElementById('result').textContent = 'This email has already been used!';
+                return;
+            }
+
+            // Pick a random team
+            const randomTeam = teams[Math.floor(Math.random() * teams.length)];
+
+            // Add the email to the Set (to prevent duplicate usage)
+            pickedEmails.add(email);
+
+            // Add to assigned teams list
+            assignedTeams.push({ name, email, team: randomTeam });
+
+            // Display the result
+            document.getElementById('result').innerHTML = `<strong>${name}</strong>, you have been assigned to <strong>${randomTeam}</strong>!`;
+
+            // Log the data (You can replace this with sending data to a server or saving it)
+            console.log({ name, email, team: randomTeam });
+        });
+
+        // Admin login functionality
+        document.getElementById('adminLoginBtn').addEventListener('click', function () {
+            const username = document.getElementById('adminUsername').value;
+            const password = document.getElementById('adminPassword').value;
+
+            // Simple authentication check
+            if (username === 'KMS' && password === 'KMS@HR') {
+                document.getElementById('adminLogin').style.display = 'none';
+                document.getElementById('adminView').style.display = 'block';
+                updateTeamTable();
+            } else {
+                alert('Incorrect admin username or password');
+            }
+        });
+
+        // Update the admin team table
+        function updateTeamTable() {
+            const tableBody = document.getElementById('teamTable');
+            tableBody.innerHTML = ''; // Clear the table first
+
+            assignedTeams.forEach(entry => {
+                const row = `<tr>
+                    <td>${entry.name}</td>
+                    <td>${entry.email}</td>
+                    <td>${entry.team}</td>
+                </tr>`;
+                tableBody.innerHTML += row;
+            });
+        }
+    </script>
+</body>
+</html>
